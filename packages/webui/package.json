@@ -1,0 +1,27 @@
+{
+  "name": "@gi-tcg/webui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./index.css": "./dist/index.css"
+  },
+  "scripts": {
+    "dev": "bunx --bun vite ./dev",
+    "build": "bun run scripts/build.ts"
+  },
+  "peerDependencies": {
+    "preact": "^10.19.3"
+  },
+  "devDependencies": {
+    "vite": "^5.0.10",
+    "@preact/preset-vite": "^2.8.1",
+    "unocss": "^0.58.3",
+    "bun-types": "^1.0.21",
+    "bun-plugin-dts": "^0.2.1"
+  }
+}
