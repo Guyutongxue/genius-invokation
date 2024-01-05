@@ -1,13 +1,11 @@
+import { Reaction as R, Aura as A, DamageType as D } from "@gi-tcg/typings";
 import {
-  Reaction as R,
-  Aura as A,
-  DamageType as D,
-  DamageType,
-} from "@gi-tcg/typings";
-import { DamageInfo, DamageModifier1, DamageModifierImpl, SkillDescription } from "../base/skill";
+  DamageInfo,
+  DamageModifierImpl,
+  SkillDescription,
+} from "../base/skill";
 import { SkillBuilder, enableShortcut } from "./skill";
 import { ExtendedSkillContext, SkillContext } from "./context";
-import { status, combatStatus, summon } from "./entity";
 import { CombatStatusHandle, StatusHandle, SummonHandle } from "./type";
 
 export type NontrivialDamageType = Exclude<D, D.Physical | D.Piercing | D.Heal>;
@@ -122,8 +120,11 @@ class ReactionBuilder extends SkillBuilder<DamageModifierR, any> {
   constructor(private reaction: R) {
     super(reaction);
   }
-  
-  protected override getExtension(skillCtx: SkillContext<false, {}, any>, arg?: any): DamageModifierR {
+
+  protected override getExtension(
+    skillCtx: SkillContext<false, {}, any>,
+    arg?: any,
+  ): DamageModifierR {
     return arg;
   }
 

@@ -3,8 +3,8 @@ import { useEffect, useRef } from "preact/hooks";
 
 import "./index.css";
 
-import { GameIO, PlayerConfig, startGame } from "@gi-tcg/core";
 import data from "@gi-tcg/data";
+import { GameIO, PlayerConfig, startGame } from "@gi-tcg/core";
 import { useCondVar, usePlayer, Chessboard } from "@gi-tcg/webui";
 
 const playerConfig0: PlayerConfig = {

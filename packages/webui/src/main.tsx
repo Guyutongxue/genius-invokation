@@ -2,8 +2,8 @@ import { render } from "preact";
 import { Chessboard } from "./index";
 import { usePlayer } from "./player";
 
-import { GameIO, PlayerConfig, startGame } from "@gi-tcg/core";
 import data from "@gi-tcg/data";
+import { GameIO, PlayerConfig, startGame } from "@gi-tcg/core";
 import { useEffect, useRef } from "preact/hooks";
 import { useCondVar } from "./utils";
 

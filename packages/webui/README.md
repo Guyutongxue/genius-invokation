@@ -11,6 +11,9 @@
 ### 例子
 
 ```tsx
+import { startGame } from "@gi-tcg/core";
+import data from "@gi-tcg/data";
+
 function App() {
   // 获取双方玩家的 io 和传入组件的 props
   const [io0, props0] = usePlayer(0);

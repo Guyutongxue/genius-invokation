@@ -1,3 +1,6 @@
+// 解决循环依赖问题
+import "./context";
+
 export { character } from "./character";
 export { skill } from "./skill";
 export { card } from "./card";
