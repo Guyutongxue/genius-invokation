@@ -1,3 +1,4 @@
-import { endRegistration } from "@gi-tcg/core/builder";
+import { ReadonlyDataStore, endRegistration } from "@gi-tcg/core/builder";
 
-export default endRegistration();
+const result: ReadonlyDataStore = endRegistration();
+export default result;

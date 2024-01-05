@@ -22,10 +22,10 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["preact"],
+      external: ["preact", /^preact\/.*/],
     },
   },
   server: {
-    watch: null,
+    // watch: null,
   },
 });

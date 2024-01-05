@@ -1,22 +1,38 @@
-import { useState } from "preact/hooks";
+import type { StateData } from "@gi-tcg/typings";
+import { MutableRef, useState } from "preact/hooks";
+import { AgentActions } from "./player";
 
-export function Chessboard() {
-  const [count, setCount] = useState(0);
+export interface ChessboardProps {
+  who: 0 | 1;
+  data: StateData;
+  actions: MutableRef<AgentActions | null>;
+  onGiveUp: () => void;
+  agent?: AgentActions;
+}
 
+export function Chessboard({ who, data, actions, agent }: ChessboardProps) {
+  if (agent) {
+    actions.current = agent;
+  } else if (actions.current === null) {
+    actions.current = {
+      onNotify: () => {},
+      onSwitchHands: async () => {
+        return { removedHands: [] };
+      },
+      onRerollDice: async () => {
+        return { rerollIndexes: [] };
+      },
+      onChooseActive: async ({ candidates }) => {
+        return { active: candidates[0] };
+      },
+      onAction: async () => {
+        throw new Error("Not implemented");
+      }
+    };
+  }
   return (
     <div class="gi-tcg-chessboard">
-      <h1>Vite + Preact <span class="text-red">+ UnoCSS</span></h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/app.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p class="read-the-docs">
-        Click on the Vite and Preact logos to learn more
-      </p>
+      <output>{ JSON.stringify(data) }</output>
     </div>
   );
 }

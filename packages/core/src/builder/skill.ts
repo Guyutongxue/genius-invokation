@@ -238,9 +238,9 @@ export type DetailedEventExt<E extends DetailedEventNames> = EventExt<
 
 export type SkillInfoGetter = () => SkillInfo;
 
-declare const EXT_TYPE_HELPER: unique symbol;
+const EXT_TYPE_HELPER: unique symbol = Symbol();
 type ExtTypeHelperSymbolType = typeof EXT_TYPE_HELPER;
-declare const CALLER_TYPE_HELPER: unique symbol;
+const CALLER_TYPE_HELPER: unique symbol = Symbol();
 type CallerTypeHelperSymbolType = typeof CALLER_TYPE_HELPER;
 
 export abstract class SkillBuilder<
