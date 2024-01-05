@@ -10,7 +10,6 @@
     "types": ["bun-types"]
   },
   "include": [
-    "dev/vite.config.ts",
-    "scripts/**/*.ts"
+    "vite.config.ts",
   ]
 }
