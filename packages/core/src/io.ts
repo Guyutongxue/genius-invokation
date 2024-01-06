@@ -27,7 +27,7 @@ export interface PlayerIO {
 }
 
 export interface GameIO {
-  pause: (st: GameState) => Promise<void>;
+  pause: (st: GameState) => Promise<unknown>;
   players: [PlayerIO, PlayerIO];
 }
 

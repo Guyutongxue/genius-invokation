@@ -11,7 +11,7 @@ import type {
 } from "@gi-tcg/typings";
 import type { PlayerIO } from "@gi-tcg/core";
 import { useEffect, useRef, useState } from "preact/hooks";
-import type { ChessboardProps } from "./chessboard";
+import type { ChessboardProps } from "./components/chessboard";
 
 const EMPTY_PLAYER_DATA: PlayerData = {
   activeCharacterId: 0,

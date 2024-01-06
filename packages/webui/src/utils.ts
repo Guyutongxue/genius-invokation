@@ -1,17 +1,21 @@
 import { useState } from "preact/hooks";
 
-export function useCondVar(): [waiting: boolean, wait: () => Promise<void>, signal: () => void] {
+export function useCondVar<T = unknown>(): [
+  waiting: boolean,
+  wait: () => Promise<T>,
+  signal: (value: T) => void,
+] {
   const [waiting, setWaiting] = useState(false);
-  const [resolve, setResolve] = useState<() => void>(() => {});
+  const [resolve, setResolve] = useState<(value: T) => void>(() => () => {});
   const wait = () => {
     setWaiting(true);
-    return new Promise<void>(r => {
+    return new Promise<T>((r) => {
       setResolve(() => r);
     });
   };
-  const signal = () => {
+  const signal = (value: T) => {
     setWaiting(false);
-    resolve();
+    return resolve(value);
   };
   return [waiting, wait, signal];
 }
