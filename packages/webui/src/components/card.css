@@ -1,0 +1,32 @@
+.gi-tcg-chessboard {
+  .hands-area {
+    .card-wrapper {
+      height: 100%;
+      perspective: 800px;
+      aspect-ratio: 1/2;
+      transition: all 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-wrapper:has(.card):hover,
+    .card-wrapper:has(.selected) {
+      aspect-ratio: 1/1;
+    }
+    .card-wrapper:hover > .card,
+    .card-wrapper > .selected {
+      transform: none;
+      transition: all 0.3s;
+    }
+
+    .card {
+      height: 100%;
+      transform: rotate3d(0, 1, 0, 30deg);
+      transition: all 0.3s;
+    }
+    .rotated {
+      transform: rotate3d(0, 1, 0, 30deg);
+    }
+  }
+}

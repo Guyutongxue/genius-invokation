@@ -14,15 +14,16 @@
     "build": "NODE_ENV=production bunx --bun vite build"
   },
   "dependencies": {
-    "@gi-tcg/typings": "workspace:*",
-    "@preact/signals": "^1.2.2"
+    "clsx": "^2.1.0"
   },
   "peerDependencies": {
-    "preact": "^10.19.3"
+    "preact": "^10.19.3",
+    "@preact/signals": "^1.2.2"
   },
   "devDependencies": {
     "@gi-tcg/core": "workspace:*",
     "@gi-tcg/data": "workspace:*",
+    "@gi-tcg/typings": "workspace:*",
     "@preact/preset-vite": "^2.8.1",
     "@types/eslint": "^8.56.1",
     "@typescript-eslint/eslint-plugin": "^6.17.0",

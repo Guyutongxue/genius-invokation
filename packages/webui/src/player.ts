@@ -22,6 +22,7 @@ const EMPTY_PLAYER_DATA: PlayerData = {
   combatStatuses: [],
   summons: [],
   supports: [],
+  skills: [],
   declaredEnd: false,
   legendUsed: false,
 };

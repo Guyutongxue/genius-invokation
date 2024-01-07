@@ -1,7 +1,8 @@
-import { CharacterData } from "@gi-tcg/typings";
+import type { CharacterData } from "@gi-tcg/typings";
 import { Image } from "./image";
 import { Status } from "./entity";
 import { usePlayerContext } from "./chessboard";
+import clsx from "clsx";
 
 export interface CharacterAreaProps {
   data: CharacterData;
@@ -20,7 +21,6 @@ function EnergyBar({ current, total }: EnergyBarProps) {
         .map((_, i) => (
           <svg // 能量点
             key={`${i}`}
-            v-for="i of total"
             viewBox="0 0 1024 1024"
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
@@ -51,10 +51,7 @@ export function CharacterArea({ data }: CharacterAreaProps) {
         {!!aura1 && <Image imageId={aura1} class="w-5" />}
         {!!aura2 && <Image imageId={aura2} class="w-5" />}
       </div>
-      <div
-        class={`h-40 relative ${selected ? "selected" : ""}`}
-        title={`id=${data.id}`}
-      >
+      <div class={clsx("h-40 relative", { selected })} title={`id=${data.id}`}>
         <div class="absolute z-10 left-[-15px] top-[-20px] flex items-center justify-center">
           <svg // 水滴
             viewBox="0 0 1024 1024"
@@ -75,9 +72,10 @@ export function CharacterArea({ data }: CharacterAreaProps) {
         <EnergyBar current={data.energy} total={data.maxEnergy} />
         <Image
           imageId={data.definitionId}
-          class={`h-full rounded-lg ${data.defeated ? "brightness-50" : ""} ${
-            clickable ? "clickable" : ""
-          }`}
+          class={clsx("h-full rounded-lg", {
+            "brightness-50": data.defeated,
+            clickable,
+          })}
           onClick={() => clickable && onClick(data.id)}
         />
         <div class="absolute left-0 bottom-0 h-6 flex flex-row">
@@ -86,10 +84,7 @@ export function CharacterArea({ data }: CharacterAreaProps) {
           ))}
         </div>
         {data.defeated && (
-          <div
-            v-if="data.defeated"
-            class="absolute z-10 top-[50%] left-0 w-full text-center text-5xl font-bold translate-y-[-50%] font-[var(--font-emoji)]"
-          >
+          <div class="absolute z-10 top-[50%] left-0 w-full text-center text-5xl font-bold translate-y-[-50%] font-[var(--font-emoji)]">
             &#9760;
           </div>
         )}

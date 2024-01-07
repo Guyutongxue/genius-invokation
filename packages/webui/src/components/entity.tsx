@@ -1,4 +1,4 @@
-import { EntityData } from "@gi-tcg/typings";
+import type { EntityData } from "@gi-tcg/typings";
 
 export interface EntityProps {
   data: EntityData;

@@ -21,8 +21,9 @@ export default defineConfig({
       formats: ["es"],
       fileName: "index",
     },
+    minify: false,
     rollupOptions: {
-      external: ["preact", /^preact\/.*/],
+      external: ["preact", /^preact\/.*/, "@preact/signals"],
     },
   },
   server: {

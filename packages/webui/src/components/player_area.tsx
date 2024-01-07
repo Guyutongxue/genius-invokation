@@ -3,7 +3,6 @@ import { usePlayerContext } from "./chessboard";
 import { Support, Summon, Status } from "./entity.tsx";
 import { CharacterArea } from "./character_area.tsx";
 import { Card } from "./card.tsx";
-import { Fragment } from "preact/jsx-runtime";
 
 export interface PlayerAreaProps {
   data: PlayerData;
@@ -30,14 +29,15 @@ export function PlayerArea({ data, opp }: PlayerAreaProps) {
               return (
                 <div class="flex flex-col" key={ch.id}>
                   <CharacterArea data={ch} />
-                  {(ch.id === data.activeCharacterId && (
+                  {ch.id === data.activeCharacterId ? (
                     <div class="h-6 flex flex-row">
                       {data.combatStatuses.map((st) => (
                         <Status key={st.id} data={st} />
                       ))}
                     </div>
-                  )) ||
-                    (opp && <div class="h-12" />)}
+                  ) : (
+                    opp && <div class="h-12" />
+                  )}
                 </div>
               );
             })}
