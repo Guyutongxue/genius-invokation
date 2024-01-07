@@ -14,7 +14,8 @@
     "build": "NODE_ENV=production bunx --bun vite build"
   },
   "dependencies": {
-    "@gi-tcg/typings": "workspace:*"
+    "@gi-tcg/typings": "workspace:*",
+    "@preact/signals": "^1.2.2"
   },
   "peerDependencies": {
     "preact": "^10.19.3"

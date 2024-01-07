@@ -26,45 +26,43 @@ export function PlayerArea({ data, opp }: PlayerAreaProps) {
             ))}
           </div>
           <div class="flex flex-row gap-6 items-end">
-            <div v-for="ch of data.characters" class="flex flex-col">
-              {data.characters.map((ch) => {
-                return (
-                  <Fragment key={ch.id}>
-                    <CharacterArea data={ch} />
-                    {(ch.id === data.activeCharacterId && (
-                      <div class="h-6 flex flex-row">
-                        {data.combatStatuses.map((st) => (
-                          <Status key={st.id} data={st} />
-                        ))}
-                      </div>
-                    )) ||
-                      (opp && <div class="h-12" />)}
-                  </Fragment>
-                );
-              })}
-            </div>
-            <div class="min-w-40">
-              {data.summons.map((summon) => (
-                <Summon key={summon.id} data={summon} />
-              ))}
-            </div>
-          </div>
-          <div
-            class={`h-30 flex flex-row mx-4 hands-area ${
-              opp ? "justify-end" : "justify-start"
-            }`}
-          >
-            {data.hands.map((card) => {
+            {data.characters.map((ch) => {
               return (
-                <Card
-                  key={card.id}
-                  data={card}
-                  // onDragstart={onDragstart}
-                  // onDragend={ondragend}
-                />
+                <div class="flex flex-col" key={ch.id}>
+                  <CharacterArea data={ch} />
+                  {(ch.id === data.activeCharacterId && (
+                    <div class="h-6 flex flex-row">
+                      {data.combatStatuses.map((st) => (
+                        <Status key={st.id} data={st} />
+                      ))}
+                    </div>
+                  )) ||
+                    (opp && <div class="h-12" />)}
+                </div>
               );
             })}
           </div>
+          <div class="min-w-40">
+            {data.summons.map((summon) => (
+              <Summon key={summon.id} data={summon} />
+            ))}
+          </div>
+        </div>
+        <div
+          class={`h-30 flex flex-row mx-4 hands-area ${
+            opp ? "justify-end" : "justify-start"
+          }`}
+        >
+          {data.hands.map((card) => {
+            return (
+              <Card
+                key={card.id}
+                data={card}
+                // onDragstart={onDragstart}
+                // onDragend={ondragend}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

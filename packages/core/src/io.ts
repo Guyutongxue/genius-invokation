@@ -11,11 +11,12 @@ import {
   RpcMethod,
   RpcRequest,
   RpcResponse,
+  SkillData,
   StateData,
 } from "@gi-tcg/typings";
 import { CardState, CharacterState, EntityState, GameState } from ".";
 import { Mutation } from "./base/mutation";
-import { ActionInfo } from "./base/skill";
+import { ActionInfo, InitiativeSkillDefinition } from "./base/skill";
 
 export interface PlayerIO {
   giveUp: boolean;
@@ -153,7 +154,9 @@ function exposeEntity(e: EntityState): EntityData {
   return {
     id: e.id,
     definitionId: e.definition.id,
-    variable: e.definition.visibleVarName ? e.variables[e.definition.visibleVarName] ?? null : null,
+    variable: e.definition.visibleVarName
+      ? e.variables[e.definition.visibleVarName] ?? null
+      : null,
     hintIcon: e.variables.hintIcon ?? null,
     hintText: e.definition.hintText,
   };
@@ -163,6 +166,7 @@ function exposeCard(c: CardState, hide: boolean): CardData {
   return {
     id: c.id,
     definitionId: hide ? 0 : c.definition.id,
+    definitionCost: hide ? [] : [...c.definition.skillDefinition.requiredCost],
   };
 }
 
@@ -174,7 +178,15 @@ function exposeCharacter(ch: CharacterState): CharacterData {
     entities: ch.entities.map(exposeEntity),
     health: ch.variables.health,
     energy: ch.variables.energy,
+    maxEnergy: ch.definition.constants.maxEnergy,
     aura: ch.variables.aura,
+  };
+}
+
+function exposeInitiativeSkill(skill: InitiativeSkillDefinition): SkillData {
+  return {
+    definitionId: skill.id,
+    definitionCost: [...skill.requiredCost],
   };
 }
 
@@ -184,18 +196,24 @@ export function exposeState(who: 0 | 1, state: GameState): StateData {
     currentTurn: state.currentTurn,
     roundNumber: state.roundNumber,
     winner: state.winner,
-    players: state.players.map<PlayerData>((p, i) => ({
-      activeCharacterId: p.activeCharacterId,
-      piles: p.piles.map((c) => exposeCard(c, true)),
-      hands: p.hands.map((c) => exposeCard(c, i !== who)),
-      characters: p.characters.map(exposeCharacter),
-      dice: i === who ? [...p.dice] : [...p.dice].fill(0),
-      combatStatuses: p.combatStatuses.map(exposeEntity),
-      supports: p.supports.map(exposeEntity),
-      summons: p.summons.map(exposeEntity),
-      declaredEnd: p.declaredEnd,
-      legendUsed: p.legendUsed,
-    })) as [PlayerData, PlayerData],
+    players: state.players.map<PlayerData>((p, i) => {
+      const skills =
+        p.characters.find((ch) => p.activeCharacterId === ch.id)?.definition
+          .initiativeSkills ?? [];
+      return {
+        activeCharacterId: p.activeCharacterId,
+        piles: p.piles.map((c) => exposeCard(c, true)),
+        hands: p.hands.map((c) => exposeCard(c, i !== who)),
+        characters: p.characters.map(exposeCharacter),
+        dice: i === who ? [...p.dice] : [...p.dice].fill(0),
+        combatStatuses: p.combatStatuses.map(exposeEntity),
+        supports: p.supports.map(exposeEntity),
+        summons: p.summons.map(exposeEntity),
+        skills: i === who ? skills.map(exposeInitiativeSkill) : [],
+        declaredEnd: p.declaredEnd,
+        legendUsed: p.legendUsed,
+      };
+    }) as [PlayerData, PlayerData],
   };
 }
 

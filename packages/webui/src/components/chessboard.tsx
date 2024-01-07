@@ -2,6 +2,7 @@ import type { StateData } from "@gi-tcg/typings";
 import { MutableRef, useContext, useState } from "preact/hooks";
 import { AgentActions } from "../player";
 import { createContext } from "preact";
+import { PlayerArea } from "./player_area";
 
 export interface ChessboardProps {
   who: 0 | 1;
@@ -51,7 +52,7 @@ export function Chessboard({ who, data, actions, agent }: ChessboardProps) {
     // TODO
   };
   return (
-    <div class="gi-tcg-chessboard">
+    <div class="gi-tcg-chessboard flex flex-col">
       <PlayerContext.Provider
         value={{
           allClickable,
@@ -59,7 +60,8 @@ export function Chessboard({ who, data, actions, agent }: ChessboardProps) {
           onClick,
         }}
       >
-        <output>{JSON.stringify(data)}</output>
+        <PlayerArea data={data.players[1 - who]} opp={true} />
+        <PlayerArea data={data.players[who]} opp={false} />
       </PlayerContext.Provider>
     </div>
   );

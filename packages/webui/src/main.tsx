@@ -1,3 +1,4 @@
+import "preact/debug";
 import { render } from "preact";
 import { Chessboard } from "./index";
 import { usePlayer } from "./player";

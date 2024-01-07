@@ -16,6 +16,7 @@ export interface CharacterData {
   entities: EntityData[];
   health: number;
   energy: number;
+  maxEnergy: number;
   aura: Aura;
 }
 
@@ -30,6 +31,12 @@ export interface EntityData {
 export interface CardData {
   id: number;
   definitionId: number;
+  definitionCost: DiceType[];
+}
+
+export interface SkillData {
+  definitionId: number;
+  definitionCost: DiceType[];
 }
 
 export interface PlayerData {
@@ -41,6 +48,7 @@ export interface PlayerData {
   combatStatuses: EntityData[];
   supports: EntityData[];
   summons: EntityData[];
+  skills: SkillData[];
   declaredEnd: boolean;
   legendUsed: boolean;
 }
