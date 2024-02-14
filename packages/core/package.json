@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./builder": "./src/builder/index.ts"
+    "./builder": "./src/builder/index.ts",
+    "./mock": "./test/mock/index.ts"
   },
   "scripts": {
     "generate_parser": "bunx --bun ohm generateBundles -et src/query/query.ohm",

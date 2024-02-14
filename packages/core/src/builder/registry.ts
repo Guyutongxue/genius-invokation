@@ -12,16 +12,20 @@ import { GiTcgDataError } from "../error";
 let currentStore: DataStore | null = null;
 
 export function beginRegistration() {
-  if (currentStore !== null) {
-    throw new GiTcgDataError("Already in registration");
-  }
-  currentStore = {
+  beginRegistrationTo({
     characters: new Map(),
     entities: new Map(),
     skills: new Map(),
     cards: new Map(),
     passiveSkills: new Map(),
-  };
+  });
+}
+
+export function beginRegistrationTo(store: DataStore) {
+  if (currentStore !== null) {
+    throw new GiTcgDataError("Already in registration");
+  }
+  currentStore = store;
 }
 
 interface PassiveSkillDefinition {
@@ -118,5 +122,7 @@ export function getCharacterSkillDefinition(
 }
 
 export function endRegistration(): ReadonlyDataStore {
-  return getCurrentStore();
+  const result = getCurrentStore();
+  currentStore = null;
+  return result;
 }
