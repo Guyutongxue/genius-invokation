@@ -1,14 +1,13 @@
-import { Action, DiceType, RpcMethod, RpcRequest, RpcResponse, UseSkillAction } from "@gi-tcg/typings";
+import { Action, DiceType, PlayCardAction, RpcMethod, RpcRequest, RpcResponse, SwitchActiveAction, UseSkillAction } from "@gi-tcg/typings";
 import { PlayerIO } from "../../src/io";
 import { CardHandle, SkillHandle } from "../../src/builder";
 
-type SwitchActiveTarget = "prev" | "next";
 type TargetSpec = "" | ` ${number}` | ` ${number} ${number}`;
 
 export type ActionResponse =
   | `useSkill ${SkillHandle}`
   | `playCard ${CardHandle}${TargetSpec}`
-  | `switchActive ${SwitchActiveTarget}`;
+  | `switchActive ${number}`;
 
 export class MockPlayerIO implements PlayerIO {
   readonly giveUp = false as const;
@@ -29,8 +28,9 @@ export class MockPlayerIO implements PlayerIO {
       };
     }
     if (response.startsWith("useSkill")) {
+      const skillNo = Number(response.split(" ")[1]);
       const index = candidates.findIndex(
-        (c) => c.type === "useSkill" && c.skill === Number(response.split(" ")[1]),
+        (c) => c.type === "useSkill" && c.skill === skillNo,
       );
       if (index === -1) {
         this.throwInvalidResponseError(candidates, response);
@@ -50,12 +50,26 @@ export class MockPlayerIO implements PlayerIO {
       if (index === -1) {
         this.throwInvalidResponseError(candidates, response);
       }
+      const action = candidates[index] as PlayCardAction;
       return {
         chosenIndex: index,
-        cost: [],
+        cost: repeat(DiceType.Omni, action.cost.length)
       };
     }
-
+    if (response.startsWith("switchActive")) {
+      const switchTarget = Number(response.split(" ")[1]);
+      const index = candidates.findIndex(
+        (c) => c.type === "switchActive" && c.active === switchTarget,
+      );
+      if (index === -1) {
+        this.throwInvalidResponseError(candidates, response);
+      }
+      const action = candidates[index] as SwitchActiveAction;
+      return {
+        chosenIndex: index,
+        cost: repeat(DiceType.Omni, action.cost.length),
+      };
+    }
     this.throwInvalidResponseError(candidates, response);
   }
 
