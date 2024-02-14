@@ -1,5 +1,5 @@
 import minstd from "@stdlib/random-base-minstd";
-import { PhaseType } from "@gi-tcg/typings";
+import { DiceType, PhaseType } from "@gi-tcg/typings";
 import {
   CardHandle,
   CharacterHandle,
@@ -12,33 +12,36 @@ import {
   CharacterDefinition,
   CharacterVariables,
 } from "../../src/base/character";
-import { CardState, GameState } from "../../src";
+import { AnyState, CardState, GameState } from "../../src";
 import { DataStore } from "../../src/builder/registry";
 import { CardDefinition } from "../../src/base/card";
 import { mergeGameConfigWithDefault } from "../../src/game";
 import { TEST_DATA, getTestData } from "./common";
 import { EmptyCharacter } from "./mock_def";
 
+const ENTITY_ID_START = -1000000;
+let nextId = ENTITY_ID_START;
+
 export interface StateDescription {
   phase?: PhaseType;
   roundNumber?: number;
   currentTurn?: 0 | 1;
-  myActive?: CharacterHandle | 0 | 1 | 2;
-  myCharacters?: CharacterHandle[];
+  myActive?: CharacterDescription | 0 | 1 | 2;
+  myCharacters?: CharacterDescription[];
   myDice?: number[];
   myHands?: CardHandle[];
   myPiles?: CardHandle[];
-  mySupports?: HandleT<"support">[];
-  mySummons?: HandleT<"summon">[];
-  myCombatStatuses?: HandleT<"combatStatus">[];
-  oppActive?: CharacterHandle | number;
-  oppCharacters?: CharacterHandle[];
+  mySupports?: EntityDescription<"support">[];
+  mySummons?: EntityDescription<"summon">[];
+  myCombatStatuses?: EntityDescription<"combatStatus">[];
+  oppActive?: CharacterDescription | number;
+  oppCharacters?: CharacterDescription[];
   oppDice?: number[];
   oppHands?: CardHandle[];
   oppPiles?: CardHandle[];
-  oppSupports?: HandleT<"support">[];
-  oppSummons?: HandleT<"summon">[];
-  oppCombatStatuses?: HandleT<"combatStatus">[];
+  oppSupports?: EntityDescription<"support">[];
+  oppSummons?: EntityDescription<"summon">[];
+  oppCombatStatuses?: EntityDescription<"combatStatus">[];
 }
 
 function getCardDef(defId: CardHandle): CardDefinition {
@@ -49,10 +52,10 @@ function getCardDef(defId: CardHandle): CardDefinition {
   return def;
 }
 
-function buildCard(idGenerator: IdGenerator, defId: CardHandle): CardState {
+function buildCard(defId: CardHandle): CardState {
   const definition = getCardDef(defId);
   return {
-    id: idGenerator.id--,
+    id: nextId--,
     definition,
   };
 }
@@ -65,7 +68,6 @@ interface MockEntityOptions {
 }
 
 function buildEntity(
-  idGenerator: IdGenerator,
   desc: EntityDescription<any>,
   opt: MockEntityOptions = {},
 ): EntityState {
@@ -77,7 +79,7 @@ function buildEntity(
     throw new Error(`Unknown entity definition id ${desc}`);
   }
   return {
-    id: opt.id ?? idGenerator.id--,
+    id: opt.id ?? nextId--,
     definition,
     variables: {
       ...definition.constants,
@@ -89,12 +91,12 @@ function buildEntity(
 type CharacterDescription = CharacterHandle | CharacterState;
 
 interface MockCharacterOptions {
+  id?: number;
   vars?: Partial<CharacterVariables>;
   has?: EntityDescription<"equipment" | "status">[];
 }
 
 function buildCharacter(
-  idGenerator: IdGenerator,
   desc: CharacterDescription,
   opt: MockCharacterOptions = {},
 ): CharacterState {
@@ -105,9 +107,9 @@ function buildCharacter(
   if (!definition) {
     throw new Error(`Unknown character definition id ${desc}`);
   }
-  const entities = opt.has?.map((e) => buildEntity(idGenerator, e)) ?? [];
+  const entities = opt.has?.map((e) => buildEntity(e)) ?? [];
   return {
-    id: idGenerator.id--,
+    id: opt.id ?? nextId--,
     definition,
     variables: {
       ...definition.constants,
@@ -118,24 +120,16 @@ function buildCharacter(
   };
 }
 
-interface IdGenerator {
-  id: number;
-}
-
 export function mockState(desc: StateDescription = {}): GameState {
   const data: DataStore = Reflect.get(globalThis, TEST_DATA);
-  const idGenerator: IdGenerator = {
-    id: -700000,
-  };
-
   const toCharacterState = (ch: CharacterDescription) => {
-    return buildCharacter(idGenerator, ch);
+    return buildCharacter(ch);
   };
   const toEntityState = (et: EntityDescription<any>) => {
-    return buildEntity(idGenerator, et);
+    return buildEntity(et);
   };
   const toCardState = (card: CardHandle) => {
-    return buildCard(idGenerator, card);
+    return buildCard(card);
   };
   const config = mergeGameConfigWithDefault({ randomSeed: 1 });
 
@@ -143,15 +137,16 @@ export function mockState(desc: StateDescription = {}): GameState {
   let myActiveCharacterId: number;
   if (desc.myCharacters) {
     myCharacters = desc.myCharacters.map(toCharacterState);
-    if (
-      typeof desc.myActive === "number" &&
-      desc.myActive < myCharacters.length
-    ) {
-      myActiveCharacterId = myCharacters[desc.myActive].id;
+    if (typeof desc.myActive === "number") {
+      if (desc.myActive < myCharacters.length) {
+        myActiveCharacterId = myCharacters[desc.myActive].id;
+      } else {
+        throw new Error(
+          `use active index (0, 1, 2) instead of character description in myActive`,
+        );
+      }
     } else {
-      throw new Error(
-        `use active index (0, 1, 2) instead of character description in myActive`,
-      );
+      myActiveCharacterId = myCharacters[0].id;
     }
   } else {
     if (typeof desc.myActive === "number" && desc.myActive < 3) {
@@ -172,15 +167,16 @@ export function mockState(desc: StateDescription = {}): GameState {
   let oppActiveCharacterId: number;
   if (desc.oppCharacters) {
     oppCharacters = desc.oppCharacters.map(toCharacterState);
-    if (
-      typeof desc.oppActive === "number" &&
-      desc.oppActive < oppCharacters.length
-    ) {
-      oppActiveCharacterId = oppCharacters[desc.oppActive].id;
+    if (typeof desc.oppActive === "number") {
+      if (desc.oppActive < oppCharacters.length) {
+        oppActiveCharacterId = oppCharacters[desc.oppActive].id;
+      } else {
+        throw new Error(
+          `use active index (0, 1, 2) instead of character description in oppActive`,
+        );
+      }
     } else {
-      throw new Error(
-        `use active index (0, 1, 2) instead of character description in oppActive`,
-      );
+      oppActiveCharacterId = oppCharacters[0].id;
     }
   } else {
     if (typeof desc.oppActive === "number" && desc.oppActive < 3) {
@@ -208,7 +204,7 @@ export function mockState(desc: StateDescription = {}): GameState {
       {
         activeCharacterId: myActiveCharacterId,
         characters: myCharacters,
-        dice: desc.myDice ?? [],
+        dice: desc.myDice ?? new Array(16).fill(DiceType.Omni),
         hands: desc.myHands?.map(toCardState) ?? [],
         piles: desc.myPiles?.map(toCardState) ?? [],
         initialPiles: desc.myPiles?.map(getCardDef) ?? [],
@@ -224,7 +220,7 @@ export function mockState(desc: StateDescription = {}): GameState {
       {
         activeCharacterId: oppActiveCharacterId,
         characters: oppCharacters,
-        dice: desc.oppDice ?? [],
+        dice: desc.oppDice ?? new Array(16).fill(DiceType.Omni),
         hands: desc.oppHands?.map(toCardState) ?? [],
         piles: desc.oppPiles?.map(toCardState) ?? [],
         initialPiles: desc.oppPiles?.map(getCardDef) ?? [],
@@ -239,7 +235,7 @@ export function mockState(desc: StateDescription = {}): GameState {
       },
     ],
     iterators: {
-      id: idGenerator.id,
+      id: nextId,
       random: [...minstd.factory({ seed: config.randomSeed }).state],
     },
     winner: null,
@@ -247,4 +243,20 @@ export function mockState(desc: StateDescription = {}): GameState {
     globalUseSkillLog: [],
     mutationLog: [],
   };
+}
+
+export function decorate<T extends EntityType>(
+  handle: EntityDescription<T>,
+  opt: MockEntityOptions,
+): EntityState;
+export function decorate(
+  ch: CharacterDescription,
+  opt: MockCharacterOptions,
+): CharacterState;
+export function decorate(id: any, opt: any): AnyState {
+  if (id < 10000) {
+    return buildCharacter(id, opt);
+  } else {
+    return buildEntity(id, opt);
+  }
 }

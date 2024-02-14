@@ -1,10 +1,19 @@
-import { Action, DiceType, PlayCardAction, RpcMethod, RpcRequest, RpcResponse, SwitchActiveAction, UseSkillAction } from "@gi-tcg/typings";
+import {
+  Action,
+  DiceType,
+  PlayCardAction,
+  RpcMethod,
+  RpcRequest,
+  RpcResponse,
+  SwitchActiveAction,
+  UseSkillAction,
+} from "@gi-tcg/typings";
 import { PlayerIO } from "../../src/io";
 import { CardHandle, SkillHandle } from "../../src/builder";
 
 type TargetSpec = "" | ` ${number}` | ` ${number} ${number}`;
 
-export type ActionResponse =
+export type ActionResponseStr =
   | `useSkill ${SkillHandle}`
   | `playCard ${CardHandle}${TargetSpec}`
   | `switchActive ${number}`;
@@ -12,7 +21,7 @@ export type ActionResponse =
 export class MockPlayerIO implements PlayerIO {
   readonly giveUp = false as const;
 
-  actionQueue: ActionResponse[] = [];
+  actionQueue: ActionResponseStr[] = [];
 
   notify() {}
 
@@ -38,14 +47,20 @@ export class MockPlayerIO implements PlayerIO {
       const action = candidates[index] as UseSkillAction;
       return {
         chosenIndex: index,
-        cost: repeat(DiceType.Omni, action.cost.length),
+        cost: repeat(
+          DiceType.Omni,
+          action.cost.filter((d) => d !== DiceType.Energy).length,
+        ),
       };
     }
     if (response.startsWith("playCard")) {
       const [, card, ...targetStr] = response.split(" ");
       const targets = targetStr.map(Number);
       const index = candidates.findIndex(
-        (c) => c.type === "playCard" && c.card === Number(card) && sameArray(c.targets, targets),
+        (c) =>
+          c.type === "playCard" &&
+          c.card === Number(card) &&
+          sameArray(c.targets, targets),
       );
       if (index === -1) {
         this.throwInvalidResponseError(candidates, response);
@@ -53,7 +68,10 @@ export class MockPlayerIO implements PlayerIO {
       const action = candidates[index] as PlayCardAction;
       return {
         chosenIndex: index,
-        cost: repeat(DiceType.Omni, action.cost.length)
+        cost: repeat(
+          DiceType.Omni,
+          action.cost.filter((d) => d !== DiceType.Energy).length,
+        ),
       };
     }
     if (response.startsWith("switchActive")) {
@@ -67,14 +85,26 @@ export class MockPlayerIO implements PlayerIO {
       const action = candidates[index] as SwitchActiveAction;
       return {
         chosenIndex: index,
-        cost: repeat(DiceType.Omni, action.cost.length),
+        cost: repeat(
+          DiceType.Omni,
+          action.cost.filter((d) => d !== DiceType.Energy).length,
+        ),
       };
     }
     this.throwInvalidResponseError(candidates, response);
   }
 
-  private throwInvalidResponseError(candidates: readonly Action[], response: ActionResponse): never {
-    throw new Error(`"${response}" is not provided in action candidates; available actions are:\n${JSON.stringify(candidates, void 0, 2)}`);
+  private throwInvalidResponseError(
+    candidates: readonly Action[],
+    response: ActionResponseStr,
+  ): never {
+    throw new Error(
+      `"${response}" is not provided in action candidates; available actions are:\n${JSON.stringify(
+        candidates,
+        void 0,
+        2,
+      )}`,
+    );
   }
 
   async rpc<M extends RpcMethod>(method: M, data: RpcRequest[M]): Promise<any> {
