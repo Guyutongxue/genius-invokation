@@ -57,86 +57,61 @@ function buildCard(idGenerator: IdGenerator, defId: CardHandle): CardState {
   };
 }
 
-interface MockEntityState<T extends EntityType> {
-  definition: HandleT<T>;
-  variables: Partial<EntityVariables>;
-}
+type EntityDescription<T extends EntityType> = HandleT<T> | EntityState;
 
-type EntityDescription<T extends EntityType> = HandleT<T> | MockEntityState<T>;
-
-function uniformEntity(
-  desc: EntityDescription<any>,
-  vars?: Partial<EntityVariables>,
-): MockEntityState<any> {
-  if (typeof desc === "object" && "definition" in desc) {
-    return desc;
-  }
-  return {
-    definition: desc,
-    variables: vars ?? {},
-  };
-}
-
-interface MockCharacterState {
-  definition: CharacterHandle;
-  variables: Partial<CharacterVariables>;
-  entities: MockEntityState<"status" | "equipment">[];
-}
-
-type CharacterDescription = CharacterHandle | MockCharacterState;
-
-interface MockCharacterOptions {
-  vars: Partial<CharacterVariables>;
-  has?: EntityDescription<"equipment" | "status">[];
-}
-
-function uniformCharacter(
-  desc: CharacterDescription,
-  opt?: MockCharacterOptions,
-): MockCharacterState {
-  if (typeof desc === "object" && "definition" in desc) {
-    return desc;
-  }
-  return {
-    definition: desc,
-    variables: opt?.vars ?? {},
-    entities: opt?.has?.map((e) => uniformEntity(e)) ?? [],
-  };
+interface MockEntityOptions {
+  id?: number;
+  vars?: Partial<EntityVariables>;
 }
 
 function buildEntity(
   idGenerator: IdGenerator,
-  mock: MockEntityState<EntityType>,
+  desc: EntityDescription<any>,
+  opt: MockEntityOptions = {},
 ): EntityState {
-  const definition = getTestData().entities.get(mock.definition);
+  if (typeof desc === "object" && "definition" in desc) {
+    return desc;
+  }
+  const definition = getTestData().entities.get(desc);
   if (!definition) {
-    throw new Error(`Unknown entity definition id ${mock.definition}`);
+    throw new Error(`Unknown entity definition id ${desc}`);
   }
   return {
-    id: idGenerator.id--,
+    id: opt.id ?? idGenerator.id--,
     definition,
     variables: {
       ...definition.constants,
-      ...(mock.variables as EntityVariables),
+      ...((opt.vars ?? {}) as EntityVariables),
     },
   };
 }
 
+type CharacterDescription = CharacterHandle | CharacterState;
+
+interface MockCharacterOptions {
+  vars?: Partial<CharacterVariables>;
+  has?: EntityDescription<"equipment" | "status">[];
+}
+
 function buildCharacter(
   idGenerator: IdGenerator,
-  mock: MockCharacterState,
+  desc: CharacterDescription,
+  opt: MockCharacterOptions = {},
 ): CharacterState {
-  const definition = getTestData().characters.get(mock.definition);
-  if (!definition) {
-    throw new Error(`Unknown character definition id ${mock.definition}`);
+  if (typeof desc === "object" && "definition" in desc) {
+    return desc;
   }
-  const entities = mock.entities.map((e) => buildEntity(idGenerator, e));
+  const definition = getTestData().characters.get(desc);
+  if (!definition) {
+    throw new Error(`Unknown character definition id ${desc}`);
+  }
+  const entities = opt.has?.map((e) => buildEntity(idGenerator, e)) ?? [];
   return {
     id: idGenerator.id--,
     definition,
     variables: {
       ...definition.constants,
-      ...(mock.variables as CharacterVariables),
+      ...((opt.vars ?? {}) as CharacterVariables),
     },
     entities,
     damageLog: [],
@@ -154,10 +129,10 @@ export function mockState(desc: StateDescription = {}): GameState {
   };
 
   const toCharacterState = (ch: CharacterDescription) => {
-    return buildCharacter(idGenerator, uniformCharacter(ch));
+    return buildCharacter(idGenerator, ch);
   };
   const toEntityState = (et: EntityDescription<any>) => {
-    return buildEntity(idGenerator, uniformEntity(et));
+    return buildEntity(idGenerator, et);
   };
   const toCardState = (card: CardHandle) => {
     return buildCard(idGenerator, card);
