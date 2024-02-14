@@ -1,23 +1,28 @@
 import { AnyState, GameState } from "../../src/base/state";
 import { Game, PlayerConfig } from "../../src/game";
+import { executeQueryOnState } from "../../src/query";
 import { MockPlayerIO } from "./mock_io";
 import { StateDescription, mockState } from "./mock_state";
 
 export class GameTester {
-
-  game: Game | null = null;
-  state: GameState | null = null;
+  private _game: Game | null = null;
+  private _state: GameState;
 
   playerIO: readonly [MockPlayerIO, MockPlayerIO] = [
     new MockPlayerIO(),
     new MockPlayerIO(),
-  ]
+  ];
 
-  constructor() {
+  constructor(state?: StateDescription) {
+    this._state = mockState(state);
+  }
+
+  get state() {
+    return this._state;
   }
 
   setState(state: StateDescription) {
-    this.state = mockState(state);
+    this._state = mockState(state);
   }
 
   private async pause() {
@@ -25,26 +30,26 @@ export class GameTester {
   }
 
   query(query: string): AnyState[] {
-    return this.game?.query(0, query) ?? [];
-  } 
+    return (
+      this._game?.query(0, query) ?? executeQueryOnState(this._state, 0, query)
+    );
+  }
 
   start() {
     const emptyPlayerConfig: PlayerConfig = {
       cards: [],
-      characters: []
+      characters: [],
+      alwaysOmni: true,
+      noShuffle: true,
     };
-    if (this.state === null) {
-      this.state = mockState();
-    }
-    this.game = new Game({
-      data: this.state.data,
+    this._game = new Game({
+      data: this._state.data,
       io: {
         pause: () => this.pause(),
         players: this.playerIO,
       },
-      playerConfigs: [emptyPlayerConfig, emptyPlayerConfig]
+      playerConfigs: [emptyPlayerConfig, emptyPlayerConfig],
     });
-    this.game.startFromState(this.state);
+    this._game.startFromState(this._state);
   }
-
 }
