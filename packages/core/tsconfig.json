@@ -1,4 +1,5 @@
 {
+  "include": ["src/**/*.ts", "test/**/*.ts"],
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2023"],
@@ -15,5 +16,4 @@
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
 }
