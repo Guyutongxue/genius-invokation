@@ -1,0 +1,32 @@
+#import { Keqing, PlungingStrike, Icicle, Frozen } from "../blah";
+
+// 下落斩切人之后被冻住
+#setup
+
+my:
+  characters: 
+    - 
+    - [target] { aura: hydro }
+    -
+  combat statuses:
+    - Icicle
+
+opp：
+  characters:
+    - [death] { health: 1 }
+    - [next]
+    -
+  combat statuses:
+    - Icicle
+
+#test
+
+play card PlungingStrike {
+  target: [target]
+};
+assert [death].alive == 0;
+opp choose active [next];
+assert exists $(my status with definition id {Frozen} at [target]);
+assert [next].health == 10;
+
+#end
