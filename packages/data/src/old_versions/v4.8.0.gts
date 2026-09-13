@@ -7,7 +7,7 @@ import {
 import {
   AlldevouringNarwhal,
   AnomalousAnatomy,
-  LightlessFeeding,
+  StarfallShowerDisposeCard,
 } from "../characters/hydro/alldevouring_narwhal.gts";
 
 /**
@@ -122,9 +122,7 @@ define skill {
   :damage(DamageType.Hydro, 1 + extraDmg);
   const [card] = :discardMaxCostHands(1, { allowPreview: true });
   if (card) {
-    if (:self.hasEquipment(LightlessFeeding)) {
-      :heal(card.diceCost(), :self);
-    }
+    :emitCustomEvent(StarfallShowerDisposeCard, card.latest());
   }
 };
 
