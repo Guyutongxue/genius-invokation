@@ -205,7 +205,8 @@ export class EntityModel implements ICaller {
       skillModel.action = function (c) {
         c.dispose();
       };
-      skillModel.isDefaultDefeatedDispose = true;
+      // 默认击倒弃置必然 bypass 角色击倒条件
+      skillModel.bypassDefeatedFilter = true;
       this.skillList.unshift(skillModel.buildSkillDefinition());
     }
     // add clean-up roundEnd skill
