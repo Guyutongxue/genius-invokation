@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import { DamageType, DiceType, $ } from "@gi-tcg/core/data";
+import { DamageType, DiceType, $, customEvent, type DetailedEventArgOf } from "@gi-tcg/core/data";
 
 /**
  * @id 100
@@ -115,6 +115,9 @@ define combatStatus {
   };
 };
 
+export const BondOfLifeOnEndPhase = customEvent("common/bondOfLife/endPhase");
+export const BondOfLifeOnDamaged = customEvent<DetailedEventArgOf<"damaged">>("common/bondOfLife/damaged");
+
 /**
  * @id 122
  * @name 生命之契
@@ -134,6 +137,12 @@ define status {
     const deducted = Math.min(:getVariable("usage"), :e.expectedValue);
     :e.decreaseHeal(deducted);
     :consumeUsage(deducted);
+  };
+  on endPhase {
+    :handleCustomEventInline(BondOfLifeOnEndPhase);
+  }
+  on damaged {
+    :handleCustomEventInline(BondOfLifeOnDamaged, :rawEventArg);
   };
 };
 

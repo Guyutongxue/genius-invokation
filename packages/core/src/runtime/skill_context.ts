@@ -39,6 +39,7 @@ import {
   constructEventAndRequestArg,
   type UseSkillRequestOption,
   BeforeVariableEventArg,
+  CustomEventEventArg,
   ZeroHealthEventArg,
   ReactionEventArg,
   type CoreSkillResult,
@@ -230,6 +231,7 @@ type QueryState<Meta extends ContextMetaBase, Q extends IQuery> = RxEntityState<
  */
 export class SkillContext<Meta extends ContextMetaBase> {
   private readonly mutator: StateMutator;
+  public readonly rawEventArg: Meta["eventArgType"];
   public readonly eventArg: ApplyReactive<
     Meta,
     Omit<Meta["eventArgType"], `_${string}`>
@@ -315,7 +317,8 @@ export class SkillContext<Meta extends ContextMetaBase> {
       onResetState: () => this.areaCache.clear(),
     };
     this.mutator = new StateMutator(state, mutatorConfig);
-    this.eventArg = applyReactive(this, eventArg);
+    this.rawEventArg = eventArg;
+    this.eventArg = applyReactive(this, this.rawEventArg);
     this.self = applyReactive(this, this.skillInfo.caller) as typeof this.self;
     this.callSnippet = new Proxy(
       (arg: any) => this._callSnippetByName("default", arg),
@@ -871,6 +874,28 @@ export class SkillContext<Meta extends ContextMetaBase> {
       event,
       arg,
     );
+  }
+
+  /** 同步执行自定义事件的接收者；派生事件并入当前技能，延后结算。 */
+  handleCustomEventInline(event: CustomEvent<void>): void;
+  handleCustomEventInline<T, U extends T & { [ReactiveStateSymbol]?: never }>(
+    event: CustomEvent<T>,
+    arg: U,
+  ): void;
+  handleCustomEventInline<T>(event: CustomEvent<T>, arg?: T) {
+    const eventArg = new CustomEventEventArg(
+      this.rawState,
+      this.self.latest(),
+      event,
+      arg,
+    );
+    const { causeDefeated } = this.callAndEmit(
+      "handleInlineEvent",
+      this.skillInfo,
+      "onCustomEvent",
+      eventArg,
+    );
+    this.causeDefeated ||= causeDefeated;
   }
 
   abortPreview() {
@@ -2292,6 +2317,7 @@ type SkillContextMutativeProps =
   | "eventBoundary"
   | "emitEvent"
   | "emitCustomEvent"
+  | "handleCustomEventInline"
   | "switchActive"
   | "gainEnergy"
   | "heal"
