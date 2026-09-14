@@ -132,6 +132,7 @@ define card {
       :e.increaseDamage(1);
     };
     on useSkill {
+      usage perRound, 1;
       :combatStatus(RebelliousShield);
     };
   };
