@@ -117,6 +117,7 @@ export const TheBell = card(311305)
   .on("increaseSkillDamage")
   .increaseDamage(1)
   .on("useSkill")
+  .usagePerRound(1)
   .combatStatus(RebelliousShield)
   .done();
 
