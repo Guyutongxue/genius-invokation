@@ -337,10 +337,11 @@ define attachment {
  */
 define summon {
   id 205 as Thundercloud;
-  hint DamageType.Electro, 2;
+  variable damageValue, 2, { forceOverwrite; };
+  hint DamageType.Electro, ((st, self) => self.variables.damageValue);
   on endPhase {
     usage 1 { append; };
-    :damage(DamageType.Electro, 2);
+    :damage(DamageType.Electro, :getVariable("damageValue"));
   };
   defineSnippet giveOppRandomCardConductive {
     if (:oppPlayer.hands.length === 0) {
