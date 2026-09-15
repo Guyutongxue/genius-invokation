@@ -84,6 +84,7 @@ define combatStatus {
 /**
  * @id 15031
  * @name 神代射术
+ * @cost 1*Anemo, 2*Void
  * @description
  * 造成2点物理伤害。
  */
@@ -98,6 +99,7 @@ define skill {
 /**
  * @id 15032
  * @name 高天之歌
+ * @cost 3*Anemo
  * @description
  * 造成2点风元素伤害，生成风域。
  */
@@ -116,6 +118,7 @@ define skill {
 /**
  * @id 15033
  * @name 风神之诗
+ * @cost 3*Anemo, 2*Energy
  * @description
  * 造成2点风元素伤害，召唤暴风之眼。
  */
@@ -131,6 +134,8 @@ define skill {
 /**
  * @id 1503
  * @name 温迪
+ * @hp 12
+ * @energy 2
  * @description
  * 「四季轮转，四风从不止息。」
  * 「当然啦，功劳也不是它们的，主要是我的。」
@@ -148,6 +153,7 @@ define character {
 /**
  * @id 215031
  * @name 绪风之拥
+ * @cost 3*Anemo
  * @description
  * 战斗行动：我方出战角色为温迪时，装备此牌。
  * 温迪装备此牌后，立刻使用一次高天之歌。
@@ -168,6 +174,7 @@ define card {
 /**
  * @id 215032
  * @name 颂时风若
+ * @cost 3*Anemo
  * @description
  * 快速行动：装备给我方的温迪。
  * 召唤暴风之眼。
