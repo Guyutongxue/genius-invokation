@@ -111,7 +111,7 @@ define card {
  * 提供1点护盾，保护我方出战角色。（可叠加，最多叠加到2点）
  */
 define combatStatus {
-  id 121013 as private RebelliousShield;
+  id 121013 as RebelliousShield;
   shield 1, 2;
 };
 
