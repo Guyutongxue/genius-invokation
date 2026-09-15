@@ -100,6 +100,7 @@ define status {
 /**
  * @id 11121
  * @name 洑流剑
+ * @cost 1*Cryo, 2*Void
  * @description
  * 造成2点物理伤害。
  */
@@ -114,6 +115,7 @@ define skill {
 /**
  * @id 11122
  * @name 浮冰增压
+ * @cost 3*Cryo
  * @description
  * 造成2点冰元素伤害，若角色未附属佩伊刻计，则使其附属佩伊刻计。
  */
@@ -130,6 +132,7 @@ define skill {
 /**
  * @id 11123
  * @name 猎影潜袭
+ * @cost 3*Cryo, 2*Energy
  * @description
  * 造成4点冰元素伤害，本角色附属潜猎模式。
  */
@@ -145,6 +148,8 @@ define skill {
 /**
  * @id 1112
  * @name 菲米尼
+ * @hp 10
+ * @energy 2
  * @description
  * 繁星丽天，孤怀寒芒。
  */
@@ -160,6 +165,7 @@ define character {
 /**
  * @id 211121
  * @name 梦晓与决意之刻
+ * @cost 3*Cryo
  * @description
  * 战斗行动：我方出战角色为菲米尼时，装备此牌。
  * 菲米尼装备此牌后，立刻使用一次浮冰增压。
