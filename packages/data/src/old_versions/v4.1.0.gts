@@ -43,7 +43,10 @@ import {
   PactswornPathclearer,
   SecretRiteChasmicSoulfarer,
 } from "../characters/electro/cyno.gts";
-import { BakeKurage } from "../characters/hydro/sangonomiya_kokomi.gts";
+import {
+  BakeKurage,
+  CeremonialGarment,
+} from "../characters/hydro/sangonomiya_kokomi.gts";
 import {
   Amber,
   BaronBunny,
@@ -466,6 +469,7 @@ define skill {
   cost DiceType.Energy, 2;
   :damage(DamageType.Hydro, 2);
   :heal(1, $.my.character);
+  :characterStatus(CeremonialGarment);
   if (
     :self.hasEquipment(TamakushiCasket) &&
     :query($.my.summon.def(BakeKurage))
